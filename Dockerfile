@@ -1,3 +1,23 @@
-FROM tiangolo/uwsgi-nginx-flask:python3.7
-COPY ./app /app
-RUN pip3 install -r /app/requirements.txt
+FROM alpine
+EXPOSE 9090
+WORKDIR /opt/wsgi
+
+RUN apk update && \
+    apk --no-cache add bash ca-certificates wget uwsgi-http python3 \
+    uwsgi-python3 && \
+    update-ca-certificates && \
+    apk --update add tzdata && \
+    cp /usr/share/zoneinfo/America/Chicago /etc/localtime && \
+    apk del tzdata && \
+    python3 -m ensurepip && \
+    rm -r /usr/lib/python*/ensurepip && \
+    pip3 install --upgrade pip setuptools && \
+    if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
+    if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
+    rm -r /root/.cache
+
+COPY ./app /opt/wsgi
+RUN cd /opt/wsgi && chown -R uwsgi:uwsgi .
+RUN pip3 install -r /opt/wsgi/requirements.txt
+
+CMD [ "uwsgi", "--plugins", "http,python3", "--http", ":9090", "--uid", "uwsgi","--gid", "uwsgi", "--wsgi-file", "/opt/wsgi/main.py" ]

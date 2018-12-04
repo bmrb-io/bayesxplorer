@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-""" Power the gateway server. """
+""" Power the Bayes Explorer server. """
 
 from __future__ import print_function
 
@@ -13,23 +13,23 @@ from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 
 # Set up the flask application
-app = Flask(__name__)
+application = Flask(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-app.config['UPLOAD_FOLDER'] = os.path.join(dir_path, 'uploads')
+application.config['UPLOAD_FOLDER'] = os.path.join(dir_path, 'uploads')
 
-app.config.update(
+application.config.update(
     MAIL_SERVER='cowfish',
     MAIL_DEFAULT_SENDER='noreply@nmrfam.wisc.edu'
 )
-mail = Mail(app)
+mail = Mail(application)
 
 
-@app.route('/')
+@application.route('/')
 def home_page():
     return render_template('submit.html')
 
 
-@app.route('/upload', methods=['POST'])
+@application.route('/upload', methods=['POST'])
 def upload_file():
     # get posted parameters
 
@@ -48,7 +48,7 @@ def upload_file():
         return render_template('submission_status.html', message='Please provide the CSV file.')
 
     uuid = str(uuid4())
-    entry_dir = os.path.join(app.config['UPLOAD_FOLDER'], uuid)
+    entry_dir = os.path.join(application.config['UPLOAD_FOLDER'], uuid)
     os.mkdir(entry_dir)
 
     if csvfile and (zipfile or validate_only) and email:
