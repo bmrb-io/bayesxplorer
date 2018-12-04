@@ -8,7 +8,7 @@ import os
 from uuid import uuid4
 
 # Installed packages
-from flask import Flask, request, jsonify, redirect, render_template, url_for
+from flask import Flask, request, render_template, url_for
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 
@@ -19,7 +19,7 @@ app.config['UPLOAD_FOLDER'] = os.path.join(dir_path, 'uploads')
 
 app.config.update(
     MAIL_SERVER='cowfish',
-    MAIL_DEFAULT_SENDER='noreply@bmrb.wisc.edu'
+    MAIL_DEFAULT_SENDER='noreply@nmrfam.wisc.edu'
 )
 mail = Mail(app)
 
@@ -33,24 +33,48 @@ def home_page():
 def upload_file():
     # get posted parameters
 
-    csvfile = request.files['csv_file']
-    zipfile = request.files['zip_file']
-    email = request.form.get('email', None)
+    csvfile = request.files.get('csv_file')
+    zipfile = request.files.get('zip_file')
+    email = request.form.get('email')
+    field_strength = request.form.get('field_strength', 'unknown')
+    sample = request.form.get('sample', 'unknown')
+    validate_only = request.form.get('validate_only', 'False')
+    if validate_only == 'on':
+        validate_only = 'False'
+
+    if not email:
+        return render_template('submission_status.html', message='Please provide your email.')
+    if not csvfile:
+        return render_template('submission_status.html', message='Please provide the CSV file.')
+
     uuid = str(uuid4())
     entry_dir = os.path.join(app.config['UPLOAD_FOLDER'], uuid)
     os.mkdir(entry_dir)
-    print(csvfile, zipfile, email, request.form)
-    if csvfile and zipfile and email:
+
+    if csvfile and (zipfile or validate_only) and email:
         csv_filename = secure_filename(csvfile.filename)
-        zip_filename = secure_filename(zipfile.filename)
         csvfile.save(os.path.join(entry_dir, csv_filename))
-        csvfile.save(os.path.join(entry_dir, zip_filename))
-        with open(os.path.join(entry_dir, 'email'), "w") as email_file:
-            email_file.write(email)
+        if zipfile:
+            zip_filename = secure_filename(zipfile.filename)
+            zipfile.save(os.path.join(entry_dir, zip_filename))
+        else:
+            zip_filename = 'None'
+
+        submission_info = '''Submission ID: %s
+Submission directory: %s
+User e-mail: %s
+Field strength: %s 
+Sample: %s
+Validate only: %s
+CSV file name: %s
+Zip file name: %s
+''' % (uuid, entry_dir, email, field_strength, sample, validate_only, csv_filename, zip_filename)
+
+        with open(os.path.join(entry_dir, 'status'), "w") as status_file:
+            status_file.write(submission_info)
 
         confirm_message = Message("Submission made to Bayes Explorer.", recipients=['wedell@bmrb.wisc.edu'])
-        confirm_message.body = 'Submission ID: %s\nSubmission directory: %s\nUser e-mail: %s\nCSV file name:%s\n'\
-                               'Zip file name: %s' % (uuid, entry_dir, email, csv_filename, zip_filename)
+        confirm_message.body = submission_info
         mail.send(confirm_message)
         return render_template('submission_status.html', message='Submission complete!')
 

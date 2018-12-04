@@ -12,8 +12,44 @@
 
             <div class="row">
                 <div class="input-field col s12">
-                  <input id="email" name="email" type="email" class="validate">
+                  <input id="email" name="email" type="email" class="validate" required="" aria-required="true">
                   <label for="email">Email</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s6">
+                    <select id="sample" name="sample">
+                        <option value="" disabled selected>Choose the biological tissue type</option>
+                        <option class="black-text" value="blood">Blood</option>
+                        <option class="black-text" value="plasma">Plasma</option>
+                        <option class="black-text" value="serum">Serum</option>
+                        <option class="black-text" value="urine">Urine</option>
+                        <option class="black-text" value="liver">Liver</option>
+                        <option class="black-text" value="CSF">CSF</option>
+                        <option class="black-text" value="breath">Breath</option>
+                        <option class="black-text" value="momentum">Momentum</option>
+                        <option class="black-text" value="feces">Feces</option>
+                        <option class="black-text" value="subcutaneous">Subcutaneous</option>
+                    </select>
+                </div>
+                <div class="input-field col s6">
+                    <select id="field_strength" name="field_strength">
+                        <option value="" disabled selected>Choose the field strength</option>
+                        <option class="black-text" value="100 MHz">100 MHz</option>
+                        <option class="black-text" value="200 MHz">100 MHz</option>
+                        <option class="black-text" value="300 MHz">300 MHz</option>
+                        <option class="black-text" value="400 MHz">400 MHz</option>
+                        <option class="black-text" value="500 MHz">500 MHz</option>
+                        <option class="black-text" value="600 MHz">600 MHz</option>
+                        <option class="black-text" value="700 MHz">700 MHz</option>
+                        <option class="black-text" value="750 MHz">750 MHz</option>
+                        <option class="black-text" value="800 MHz">800 MHz</option>
+                        <option class="black-text" value="900 MHz">900 MHz</option>
+                        <option class="black-text" value="950 MHz">950 MHz</option>
+                        <option class="black-text" value="1000 MHz">1000 MHz</option>
+                        <option class="black-text" value="1300 MHz">1300 MHz</option>
+                    </select>
                 </div>
             </div>
 
@@ -30,14 +66,19 @@
             </div>
 
             <p>Please provide a zip file that contains the processed NMR spectrum (1r) within its standard directory
-                structure.</p><p>At the command line, you can zip files in multiple directories by using the command  "zip -r spectra.zip dir1 dir2 dir3 ...."</p>
+                structure.</p>
+            <p>At the command line, you can zip files in multiple directories by using the command  "zip -r spectra.zip dir1 dir2 dir3 ...."</p>
+            <label class="black-text">
+                <input type="checkbox" class="checkbox-indigo filled-in" id="validate_only" name="validate_only">
+                <span>Validate only (no Zip file needed)</span>
+            </label>
             <div class="file-field input-field">
-                <div class="btn indigo lighten-1">
+                <div class="btn indigo lighten-1" id="zip_wrapper">
                     <span>Zip file</span>
                     <input type="file" name="zip_file" id="zip_file" accept=".zip">
                 </div>
                 <div class="file-path-wrapper">
-                    <input class="file-path validate" type="text">
+                    <input class="file-path validate" type="text" id="zip_file_text">
                 </div>
             </div>
 
@@ -53,4 +94,25 @@
         </fieldset>
     </div>
 </form>
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+var elems = document.querySelectorAll('select');
+var instances = M.FormSelect.init(elems, 'options');
+});
+
+document.getElementById('validate_only').onchange = function() {
+    $('#zip_file').prop('disabled', $('#validate_only').prop('checked'));
+    $('#zip_file_text').prop('disabled', $('#validate_only').prop('checked'));
+    if ($('#validate_only').prop('checked')){
+        $('#zip_wrapper').addClass('disabled').val('');
+        $('#zip_file_text').val('');
+    } else {
+        $('#zip_wrapper').removeClass('disabled');
+    }
+};
+
+</script>
 {% endblock %}
