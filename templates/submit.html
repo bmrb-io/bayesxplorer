@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block body %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<form action="upload" method="post" enctype="multipart/form-data" target="_blank">
+
+    <div class="input-field">
+        <fieldset>
+            <legend><b><font size="5">Submit to Bayes Explorer </font></b></legend>
+
+            <h5>Bayes Explorer I provides estimates for concentration of metabolites.</h5>
+
+            <div class="row">
+                <div class="input-field col s12">
+                  <input id="email" name="email" type="email" class="validate">
+                  <label for="email">Email</label>
+                </div>
+            </div>
+
+            <p>Please provide a CSV (comma-separated value) file that contains an estimate for the identity of
+                metabolites and their concentrations.</p>
+            <div class="file-field input-field">
+                <div class="btn indigo lighten-1">
+                    <span>CSV File</span>
+                    <input type="file" name="csv_file" id="csv_file" accept=".csv">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+            </div>
+
+            <p>Please provide a zip file that contains the processed NMR spectrum (1r) within its standard directory
+                structure.</p><p>At the command line, you can zip files in multiple directories by using the command  "zip -r spectra.zip dir1 dir2 dir3 ...."</p>
+            <div class="file-field input-field">
+                <div class="btn indigo lighten-1">
+                    <span>Zip file</span>
+                    <input type="file" name="zip_file" id="zip_file" accept=".zip">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+            </div>
+
+            <p>Note: The algorithm does not require that the
+            identities and concentrations provided by the user be completely accurate. This is used as a starting
+            point (a prior). Better priors lead to faster run times and more accurate results. You will be contacted
+            at the email provided when the results are ready, and will be provided with a spreadsheet and instructions
+            for interpreting the results.</p>
+            <button class="btn waves-effect waves-light indigo lighten-1" type="submit" value="Submit">Submit
+                <i class="material-icons right">send</i>
+            </button>
+
+        </fieldset>
+    </div>
+</form>
+{% endblock %}
