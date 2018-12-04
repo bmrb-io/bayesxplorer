@@ -13,23 +13,23 @@ from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 
 # Set up the flask application
-application = Flask(__name__)
+app = Flask(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-application.config['UPLOAD_FOLDER'] = os.path.join(dir_path, 'uploads')
+app.config['UPLOAD_FOLDER'] = os.path.join(dir_path, 'uploads')
 
-application.config.update(
+app.config.update(
     MAIL_SERVER='cowfish',
     MAIL_DEFAULT_SENDER='noreply@bmrb.wisc.edu'
 )
-mail = Mail(application)
+mail = Mail(app)
 
 
-@application.route('/')
+@app.route('/')
 def home_page():
     return render_template('submit.html')
 
 
-@application.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def upload_file():
     # get posted parameters
 
@@ -37,7 +37,7 @@ def upload_file():
     zipfile = request.files['zip_file']
     email = request.form.get('email', None)
     uuid = str(uuid4())
-    entry_dir = os.path.join(application.config['UPLOAD_FOLDER'], uuid)
+    entry_dir = os.path.join(app.config['UPLOAD_FOLDER'], uuid)
     os.mkdir(entry_dir)
     print(csvfile, zipfile, email, request.form)
     if csvfile and zipfile and email:
