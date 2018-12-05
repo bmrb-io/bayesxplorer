@@ -20,4 +20,8 @@ COPY ./app /opt/wsgi
 RUN cd /opt/wsgi && chown -R uwsgi:uwsgi .
 RUN pip3 install -r /opt/wsgi/requirements.txt
 
-CMD [ "uwsgi", "--plugins", "http,python3", "--http", ":9090", "--uid", "uwsgi","--gid", "uwsgi", "--wsgi-file", "/opt/wsgi/main.py" ]
+ARG configfile
+ENV configfile=${configfile:-./development.conf}
+COPY ${configfile} /opt/wsgi/wsgi.conf
+
+CMD [ "uwsgi", "--ini", "/opt/wsgi/wsgi.conf" ]
